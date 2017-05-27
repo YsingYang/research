@@ -1,0 +1,34 @@
+# depslib dependency file v1.0
+1495805300 source:/home/ysing/codeblock Projects/80211Capture/pcapHandle.cpp
+	"pcapHandle.h"
+
+1495809469 /home/ysing/codeblock Projects/80211Capture/pcapHandle.h
+	"type.h"
+	"80211Packet.h"
+
+1495804762 source:/home/ysing/codeblock Projects/80211Capture/main.cpp
+	"pcapHandle.h"
+
+1495808737 /home/ysing/codeblock Projects/80211Capture/type.h
+	"ieee80211.h"
+	"ieee80211_radiotap.h"
+	<pcap.h>
+	<string>
+	<stdio.h>
+	<stdint.h>
+	<netinet/in.h>
+
+1495807999 /home/ysing/codeblock Projects/80211Capture/ieee80211.h
+	<linux/types.h>
+	<linux/if_ether.h>
+	<linux/etherdevice.h>
+	<asm/byteorder.h>
+	<asm/unaligned.h>
+
+1495722088 /home/ysing/codeblock Projects/80211Capture/ieee80211_radiotap.h
+	<linux/kernel.h>
+	<asm/unaligned.h>
+
+1495808379 /home/ysing/codeblock Projects/80211Capture/80211Packet.h
+	"type.h"
+
