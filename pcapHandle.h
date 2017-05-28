@@ -42,6 +42,7 @@ static void pcapHandle::LoopFunc(u_char* handleFileDescription, const struct pca
     uint32_t fLength = PacketHeader->caplen - rtLength;
 
     _80211Packet capturedPacket(rtLength, fLength);
+
     capturedPacket.setRadiotapHeader(rtHeader); //radiotap_header
     capturedPacket.setFrame(rtHeader + rtLength);//frame body
     //开始解析
