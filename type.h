@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <netinet/in.h>
 #include <functional>
+#include <string.h>
 
 #define le16_to_cpu __le16_to_cpu
 

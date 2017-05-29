@@ -1,15 +1,16 @@
 # depslib dependency file v1.0
-1495805300 source:/home/ysing/codeblock Projects/80211Capture/pcapHandle.cpp
+1496065113 source:/home/ysing/codeblock Projects/80211Capture/pcapHandle.cpp
 	"pcapHandle.h"
 
-1495973451 /home/ysing/codeblock Projects/80211Capture/pcapHandle.h
+1496065113 /home/ysing/codeblock Projects/80211Capture/pcapHandle.h
 	"type.h"
 	"80211Packet.h"
 
-1495804762 source:/home/ysing/codeblock Projects/80211Capture/main.cpp
+1496069784 source:/home/ysing/codeblock Projects/80211Capture/main.cpp
 	"pcapHandle.h"
+	"processServer.h"
 
-1495808737 /home/ysing/codeblock Projects/80211Capture/type.h
+1496066320 /home/ysing/codeblock Projects/80211Capture/type.h
 	"ieee80211.h"
 	"ieee80211_radiotap.h"
 	<pcap.h>
@@ -17,20 +18,21 @@
 	<stdio.h>
 	<stdint.h>
 	<netinet/in.h>
+	<functional>
+	<string.h>
 
-1495807999 /home/ysing/codeblock Projects/80211Capture/ieee80211.h
+1496065113 /home/ysing/codeblock Projects/80211Capture/ieee80211.h
 	<linux/types.h>
 	<linux/if_ether.h>
-	<linux/etherdevice.h>
 	<asm/byteorder.h>
-	<asm/unaligned.h>
+	<stdint-gcc.h>
 
-1495722088 /home/ysing/codeblock Projects/80211Capture/ieee80211_radiotap.h
-	<linux/kernel.h>
-	<asm/unaligned.h>
+1496065113 /home/ysing/codeblock Projects/80211Capture/ieee80211_radiotap.h
+	<stdint.h>
 
-1495973451 /home/ysing/codeblock Projects/80211Capture/80211Packet.h
+1496065113 /home/ysing/codeblock Projects/80211Capture/80211Packet.h
 	"type.h"
+	"ieee80211.h"
 
 1496063664 source:/home/ycyber/Cprogram/80211Capture/main.cpp
 	"pcapHandle.h"
@@ -67,4 +69,35 @@
 
 1496062880 source:/home/ycyber/Cprogram/80211Capture/80211Packet.cpp
 	"80211Packet.h"
+
+1496065113 source:/home/ysing/codeblock Projects/80211Capture/80211Packet.cpp
+	"80211Packet.h"
+
+1496070693 source:/home/ysing/codeblock Projects/80211Capture/processServer.cpp
+	"processServer.h"
+
+1496069920 /home/ysing/codeblock Projects/80211Capture/processServer.h
+	<sys/socket.h>
+	<arpa/inet.h>
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	"PNEpollManager.h"
+	"80211Packet.h"
+
+1496070738 source:/home/ysing/codeblock Projects/80211Capture/PNEpollManager.cpp
+	"PNEpollManager.h"
+	<stdlib.h>
+	<fcntl.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<unistd.h>
+	<stdio.h>
+
+1496070840 /home/ysing/codeblock Projects/80211Capture/PNEpollManager.h
+	<sys/epoll.h>
+	<string.h>
+	<stdio.h>
+	<list>
+	<fcntl.h>
 

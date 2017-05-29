@@ -39,6 +39,8 @@
 		</Compiler>
 		<Unit filename="80211Packet.cpp" />
 		<Unit filename="80211Packet.h" />
+		<Unit filename="PNEpollManager.cpp" />
+		<Unit filename="PNEpollManager.h" />
 		<Unit filename="Router/ieee80211.h" />
 		<Unit filename="Router/ieee80211_radiotap.h" />
 		<Unit filename="Router/routerForwardPacket.h" />
@@ -47,6 +49,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="pcapHandle.cpp" />
 		<Unit filename="pcapHandle.h" />
+		<Unit filename="processServer.cpp" />
+		<Unit filename="processServer.h" />
 		<Unit filename="type.h" />
 		<Extensions>
 			<code_completion />
