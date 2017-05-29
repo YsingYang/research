@@ -2,7 +2,7 @@
 #define _80211PACKET_H
 
 #include "type.h"
-
+#include "ieee80211.h"
 
 #define  PROBE_REQUEST 1
 #define  BEACON 2
@@ -21,8 +21,8 @@ public:
     _80211Packet(uint32_t rtLen, uint32_t fLen);
 
     //Shallow copy!!
-    inline void setRadiotapHeader(u_char* data);
-    inline void setFrame(u_char* data);
+    inline void setRadiotapHeader(rt_header_t* data);
+    inline void setFrame(frame_t* data);
 
     void parse(int flag);
 
@@ -33,19 +33,19 @@ public:
         parseBeacon = func;
     }
 
-    void setParseRTS(std::function<void>() func){
+    void setParseRTS(std::function<void()> func){
         parseRTS = func;
     }
 
-    void setParseCTS(std::function<void>() func){
+    void setParseCTS(std::function<void()> func){
         parseCTS = func;
     }
 
-    void setParseQOSData(std::function<void>() func){
+    void setParseQOSData(std::function<void()> func){
         parseQOSData = func;
     }
 
-    void setParseData(std::function<void>() func){
+    void setParseData(std::function<void()> func){
         parseData = func;
     }
 
@@ -68,12 +68,12 @@ private:
 };
 
 
-inline void setRadiotapHeader(u_char* data){
-    radiotapHeader = (struct ieee80211_radiotap_header* )(data);
+inline void _80211Packet::setRadiotapHeader(rt_header_t* data){
+    radiotapHeader = data;
 }
 
-inline void setFrame(u_char* data){
-    frame = (ieee80211_hdr*) data;
+inline void _80211Packet::setFrame(frame_t* data){
+    frame = data;
 }
 
 

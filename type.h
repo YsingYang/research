@@ -8,12 +8,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <netinet/in.h>
+#include <functional>
 
-
+#define le16_to_cpu __le16_to_cpu
 
 namespace hd80211{
-    typedef ieee80211_radiotap_header rt_header_t;
-    typedef ieee80211_hdr frame_t;
+    typedef struct ieee80211_radiotap_header rt_header_t;
+    typedef struct ieee80211_hdr frame_t;
 }
 
 #endif // CAPTURETYPE_H

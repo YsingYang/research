@@ -3,11 +3,13 @@
 
 
 
-_80211Packet(uint32_t rtLen, uint32_t fLen) :  radiotapHeaderLength(rtLen), frameLength(fLen){
 
+_80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :  radiotapHeaderLength(rtLen), frameLength(fLen){
+    radiotapHeader = nullptr;
+    frame = nullptr;
 }
 
-_80211Packet::parse(int flag){
+void _80211Packet::parse(int flag){
     if((flag &  PROBE_REQUEST) && ieee80211_is_probe_req(frame -> frame_control)){
         parseProbeRequest();
         return;

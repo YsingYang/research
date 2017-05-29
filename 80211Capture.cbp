@@ -42,11 +42,9 @@
 		<Unit filename="Router/ieee80211.h" />
 		<Unit filename="Router/ieee80211_radiotap.h" />
 		<Unit filename="Router/routerForwardPacket.h" />
-		<Unit filename="Router/routerMain.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="ieee80211.h" />
 		<Unit filename="ieee80211_radiotap.h" />
+		<Unit filename="main.cpp" />
 		<Unit filename="pcapHandle.cpp" />
 		<Unit filename="pcapHandle.h" />
 		<Unit filename="type.h" />
