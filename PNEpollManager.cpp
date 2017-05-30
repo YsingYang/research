@@ -8,6 +8,7 @@
 
 PNEpollManager::PNEpollManager(){
     epollFD = epoll_create(EPOLL_CLOEXEC);//创建一个epollFD
+    memset((void*)(recvEvent), 0, sizeof(recvEvent));
     //创建最大可创建数量
     if(epollFD <0){
         perror("epoll_create error  ");
@@ -18,7 +19,8 @@ PNEpollManager::~PNEpollManager(){
 }
 
 int PNEpollManager::eventPoller(int waitMs){ //暂时只处理
-    return epoll_wait(epollFD, (struct epoll_event*)recvEvent, maxEvents, waitMs);
+    int num = epoll_wait(epollFD, recvEvent, maxEvents, waitMs);
+    return num;
 }
 
 bool PNEpollManager::addEvent(const int fd, int op){ ///单单先考虑读与ET 模式,
@@ -26,10 +28,11 @@ bool PNEpollManager::addEvent(const int fd, int op){ ///单单先考虑读与ET 
     memset(&temp, 0, sizeof(temp));
     temp.data.fd = fd;
     temp.events = EPOLLIN;
-
         // 不判断小于0了
     setNoBlock(fd);
-    epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &temp);
+    if(epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &temp) < 0){
+        perror("add event error");
+    }
     return true;
 }
 

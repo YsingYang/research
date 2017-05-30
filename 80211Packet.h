@@ -26,26 +26,26 @@ public:
 
     void parse(int flag);
 
-    void setParseProbeRequest(std::function<void()> func){
+    static  void setParseProbeRequest(std::function<void()> func){
         parseProbeRequest = func;
     }
-    void setParseBeacon(std::function<void()> func){
+    static void setParseBeacon(std::function<void()> func){
         parseBeacon = func;
     }
 
-    void setParseRTS(std::function<void()> func){
+    static void setParseRTS(std::function<void()> func){
         parseRTS = func;
     }
 
-    void setParseCTS(std::function<void()> func){
+    static void setParseCTS(std::function<void()> func){
         parseCTS = func;
     }
 
-    void setParseQOSData(std::function<void()> func){
+    static void setParseQOSData(std::function<void()> func){
         parseQOSData = func;
     }
 
-    void setParseData(std::function<void()> func){
+    static void setParseData(std::function<void()> func){
         parseData = func;
     }
 
@@ -59,12 +59,12 @@ private:
     uint32_t frameLength;
 
     //用于给外部结构所需的解析函数
-    std::function<void()> parseProbeRequest;
-    std::function<void()> parseBeacon;
-    std::function<void()> parseRTS;
-    std::function<void()> parseCTS;
-    std::function<void()> parseQOSData;
-    std::function<void()> parseData;
+    static std::function<void()> parseProbeRequest;
+    static std::function<void()> parseBeacon;
+    static std::function<void()> parseRTS;
+    static std::function<void()> parseCTS;
+    static std::function<void()> parseQOSData;
+    static std::function<void()> parseData;
 };
 
 

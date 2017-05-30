@@ -1,7 +1,7 @@
 #include "pcapHandle.h"
 
 void LoopFunc(u_char* handleFileDescription, const struct pcap_pkthdr* packetHeader, const u_char* packetData){
-    rt_header_t* rtHeader = reinterpret_cast<rt_header_t*>(const_cast<u_char*>(packetData)); ///会不会出bug?
+    rt_header_t* rtHeader = (rt_header_t*)packetData; ///会不会出bug?
     uint32_t rtLength = le16_to_cpu( rtHeader -> it_len); //这句需要?
     if(rtLength > packetHeader->caplen){
         printf("radiotap length exceeds package caplen");

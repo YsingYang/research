@@ -2,6 +2,12 @@
 
 
 
+std::function<void()> _80211Packet::parseProbeRequest = nullptr;
+std::function<void()> _80211Packet::parseBeacon = nullptr;
+std::function<void()> _80211Packet::parseRTS = nullptr;
+std::function<void()> _80211Packet::parseCTS = nullptr;
+std::function<void()> _80211Packet::parseQOSData = nullptr;
+std::function<void()> _80211Packet::parseData =nullptr ;
 
 
 _80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :  radiotapHeaderLength(rtLen), frameLength(fLen){
@@ -36,4 +42,6 @@ void _80211Packet::parse(int flag){
     }
 }
 
+void implementation(u_char* data){
 
+}

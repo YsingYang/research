@@ -15,25 +15,23 @@
 //#include "ieee80211.h"
 //#include "ieee80211_radiotap.h"
 
-
-void loopFunction(u_char *user, const struct pcap_pkthdr *packetHeader,const u_char *packetData){
+/*void loopFunction(u_char *user, const struct pcap_pkthdr *packetHeader,const u_char *packetData){
     uint32_t packetLength = packetHeader -> caplen;
     printf("%d \n", packetLength);
     //char packet[packetLength];
     //memcpy(packet, packetData, packetLength);
     //packet[packetLength] = '\0';
-    int sockFD;
-    struct sockaddr_in clientAddr;
-    sockFD = socket(AF_INET, SOCK_DGRAM, 0);
-    clientAddr.sin_family = AF_INET;
-    inet_pton(AF_INET, "192.168.1.188", &clientAddr.sin_addr);///字符串中  填入目的服务器的地址
-    clientAddr.sin_port = htons(6666);
+
+    if(connect(sockFD, (sockaddr*)&clientAddr), sizeof(sockaddr) < 0){
+        perror("connect error ");
+        exit(1);
+    }
+
+
+
     sendto(sockFD,  packetData, packetLength, 0, (struct sockaddr*)(&clientAddr), sizeof(clientAddr));
 
-    //udp转发至目的地
-
-
-}
+}*/
 
 
 

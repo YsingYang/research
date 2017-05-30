@@ -25,13 +25,13 @@ processServer::processServer(){
     ///tcp端口5555, 没有指定ip地址
     TCPSocketAddr.sin_family = AF_INET;
     TCPSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    TCPSocketAddr.sin_port = 5555;
+    TCPSocketAddr.sin_port = htons(5555);
     TCPPort = 5555;
 
     ///udp端口为6666
     UDPSocketAddr.sin_family = AF_INET;
     UDPSocketAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    UDPSocketAddr.sin_port = 6666;
+    UDPSocketAddr.sin_port = htons(6666);
     UDPPort = 6666;
 
     printf("accept from %s :%d \n", inet_ntoa(UDPSocketAddr.sin_addr), UDPSocketAddr.sin_port);
@@ -55,9 +55,8 @@ processServer::processServer(){
 }
 
 void processServer::UDPUnpacking(int fd){
-    printf("成功\n");
-    char recvBuff[1024]; ///假设包不超过1024byte
-    memset(recvBuff, 0, 1024);
+    char recvBuff[4096]; ///假设包不超过1024byte
+    memset(recvBuff, 0, 4096);
     //不加入接受的while(循环)
     int packetSize;
     //用于记录接受的地址
@@ -65,16 +64,21 @@ void processServer::UDPUnpacking(int fd){
     socklen_t structLength = sizeof(routerAddr);
     memset((void*)&routerAddr, 0, structLength);
 
-    if((packetSize = recvfrom(fd, recvBuff, 1024, 0,(sockaddr*)&routerAddr, &structLength)) < 0){
-        return;
+    if((packetSize = recvfrom(fd, recvBuff, 4096, 0,(sockaddr*)&routerAddr, &structLength)) < 0){
+        //return;
     }
-    printf("执行测试 包大小为 %d \n", packetSize);
+    //printf("执行测试 包大小为 %d \n", packetSize);
 
-    rt_header_t* rtHeader = reinterpret_cast<rt_header_t*>(recvBuff); ///会不会出bug?
-
-    uint32_t rtLength = le16_to_cpu( rtHeader -> it_len); //这句需要?
+    rt_header_t* rtHeader = (rt_header_t*)(recvBuff); ///会不会出bug?
+    for(int i = 0; i < packetSize; ++i){
+        printf("%02X  ", recvBuff[i]);
+    }
+    printf("\n");
+    /*uint16_t rtLength = le16_to_cpu( rtHeader -> it_len); //这句需要?
+    printf("rtLength %d, packetSize %d\n",rtLength, packetSize);
     if(rtLength > packetSize){
         printf("radiotap length exceeds package caplen");
+        return;
         exit(0);
     }
     uint32_t fLength = packetSize - rtLength;
@@ -84,15 +88,15 @@ void processServer::UDPUnpacking(int fd){
     capturedPacket.setRadiotapHeader(rtHeader); //radiotap_header
     capturedPacket.setFrame((frame_t*)(rtHeader + rtLength));//frame body
     //开始解析
-    capturedPacket.parse(0);
+    capturedPacket.parse(0);*/
 }
 
 void processServer::serverProcess(){
     int recvReadyEvents;
+    //printf("%d , and %d , %d \n",TCPSocketFD, UDPSocketFD, epollManager.epollFD);
     while(1){
-            printf("执行\n");
         recvReadyEvents = epollManager.eventPoller();
-        printf("recvNum, %d\n", recvReadyEvents);
+        //printf("recvNum, %d\n", recvReadyEvents);
         for(int i = 0; i < recvReadyEvents; ++i){ ///暂时只写了UDP端口的监听
             if(epollManager.recvEvent[i].data.fd == UDPSocketFD)
                 UDPUnpacking(UDPSocketFD);

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <memory>
 #include "PNEpollManager.h"
 #include "80211Packet.h"
 //单例, 暂时没考虑线程安全
@@ -33,6 +34,7 @@ private:
     uint16_t TCPPort;
     struct sockaddr_in TCPSocketAddr, UDPSocketAddr;
     PNEpollManager epollManager;
+    std::shared_ptr<_80211Packet> recvPacket;
 };
 
 
