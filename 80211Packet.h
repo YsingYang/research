@@ -3,6 +3,7 @@
 
 #include "type.h"
 #include "ieee80211.h"
+#include "AccessPoint.h"
 
 #define  PROBE_REQUEST 1
 #define  BEACON 2

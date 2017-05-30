@@ -34,7 +34,6 @@ processServer::processServer(){
     UDPSocketAddr.sin_port = htons(6666);
     UDPPort = 6666;
 
-    printf("accept from %s :%d \n", inet_ntoa(UDPSocketAddr.sin_addr), UDPSocketAddr.sin_port);
 
 
     if(bind(TCPSocketFD, (struct sockaddr *)&TCPSocketAddr, sizeof(TCPSocketAddr)) < 0){
@@ -55,7 +54,7 @@ processServer::processServer(){
 }
 
 void processServer::UDPUnpacking(int fd){
-    char recvBuff[4096]; ///假设包不超过1024byte
+    u_char recvBuff[4096]; ///假设包不超过1024byte
     memset(recvBuff, 0, 4096);
     //不加入接受的while(循环)
     int packetSize;
@@ -70,25 +69,21 @@ void processServer::UDPUnpacking(int fd){
     //printf("执行测试 包大小为 %d \n", packetSize);
 
     rt_header_t* rtHeader = (rt_header_t*)(recvBuff); ///会不会出bug?
-    for(int i = 0; i < packetSize; ++i){
-        printf("%02X  ", recvBuff[i]);
-    }
-    printf("\n");
-    /*uint16_t rtLength = le16_to_cpu( rtHeader -> it_len); //这句需要?
-    printf("rtLength %d, packetSize %d\n",rtLength, packetSize);
+    int rtLength = le16_to_cpu( rtHeader -> it_len); //这句需要?
+    //printf("rtLength %d, packetSize %d\n",rtLength, packetSize);
     if(rtLength > packetSize){
-        printf("radiotap length exceeds package caplen");
+        //printf("radiotap length exceeds package caplen");
         return;
         exit(0);
     }
-    uint32_t fLength = packetSize - rtLength;
+    int fLength = packetSize - rtLength;
 
     _80211Packet capturedPacket(rtLength, fLength);
 
     capturedPacket.setRadiotapHeader(rtHeader); //radiotap_header
-    capturedPacket.setFrame((frame_t*)(rtHeader + rtLength));//frame body
+    capturedPacket.setFrame((frame_t*)(recvBuff + rtLength));//frame body
     //开始解析
-    capturedPacket.parse(0);*/
+    capturedPacket.parse(0);
 }
 
 void processServer::serverProcess(){
