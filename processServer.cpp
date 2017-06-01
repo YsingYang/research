@@ -1,3 +1,5 @@
+//#define __DEBUG__
+
 #include "processServer.h"
 
 
@@ -79,11 +81,19 @@ void processServer::UDPUnpacking(int fd){
     int fLength = packetSize - rtLength;
 
     _80211Packet capturedPacket(rtLength, fLength);
-
     capturedPacket.setRadiotapHeader(rtHeader); //radiotap_header
     capturedPacket.setFrame((frame_t*)(recvBuff + rtLength));//frame body
+
+    #ifdef __DEBUG__
+    printf("执行时\n");
+    #endif // __DEBUG__
+
     //开始解析
     capturedPacket.parse(0);
+
+    #ifdef __DEBUG__
+    printf("解析成功\n");
+    #endif // __DEBUG__
 }
 
 void processServer::serverProcess(){

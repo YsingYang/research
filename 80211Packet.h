@@ -4,6 +4,7 @@
 #include "type.h"
 #include "ieee80211.h"
 #include "AccessPoint.h"
+#include <memory>
 
 #define  PROBE_REQUEST 1
 #define  BEACON 2
@@ -15,19 +16,23 @@
 
 using namespace hd80211;
 
-class _80211Packet{
 
+
+
+
+class _80211Packet{
 
 public:
     _80211Packet(uint32_t rtLen, uint32_t fLen);
 
-    //Shallow copy!!
+    virtual ~_80211Packet();
+    //deep copy!!
     inline void setRadiotapHeader(rt_header_t* data);
     inline void setFrame(frame_t* data);
 
-    void parse(int flag);
+    virtual void parse(int flag);
 
-    static  void setParseProbeRequest(std::function<void()> func){
+    /*static  void setParseProbeRequest(std::function<void()> func){
         parseProbeRequest = func;
     }
     static void setParseBeacon(std::function<void()> func){
@@ -48,16 +53,16 @@ public:
 
     static void setParseData(std::function<void()> func){
         parseData = func;
-    }
+    }*/
 
 
 protected:
 
 private:
     uint32_t radiotapHeaderLength;
-    struct ieee80211_radiotap_header* radiotapHeader;
-    struct ieee80211_hdr* frame;
     uint32_t frameLength;
+    std::shared_ptr<ieee80211_radiotap_header> radiotapHeader;
+    std::shared_ptr<ieee80211_hdr> frame;
 
     //用于给外部结构所需的解析函数
     static std::function<void()> parseProbeRequest;
@@ -70,13 +75,15 @@ private:
 
 
 inline void _80211Packet::setRadiotapHeader(rt_header_t* data){
-    radiotapHeader = data;
+    memcpy((void*)(radiotapHeader.get()),  (void*)data, sizeof(rt_header_t));
 }
 
 inline void _80211Packet::setFrame(frame_t* data){
-    frame = data;
+    memcpy((void*)(frame.get()), (void*) data, sizeof(frame_t));
 }
 
+class _80211CTS : public _80211Packet{
 
+};
 
 #endif // 80211PACKET_H

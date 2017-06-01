@@ -1,17 +1,20 @@
 #include "80211Packet.h"
 
 
-std::function<void()> _80211Packet::parseProbeRequest = nullptr;
+/*std::function<void()> _80211Packet::parseProbeRequest = nullptr;
 std::function<void()> _80211Packet::parseBeacon = nullptr;
 std::function<void()> _80211Packet::parseRTS = nullptr;
 std::function<void()> _80211Packet::parseCTS = nullptr;
 std::function<void()> _80211Packet::parseQOSData = nullptr;
 std::function<void()> _80211Packet::parseData =nullptr ;
+*/
 
+_80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :
+    radiotapHeaderLength(rtLen), frameLength(fLen), radiotapHeader(new ieee80211_radiotap_header), frame(new ieee80211_hdr){
+}
 
-_80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :  radiotapHeaderLength(rtLen), frameLength(fLen){
-    radiotapHeader = nullptr;
-    frame = nullptr;
+ _80211Packet::~_80211Packet(){
+
 }
 
 void _80211Packet::parse(int flag){
@@ -37,7 +40,7 @@ void _80211Packet::parse(int flag){
     }*/
 
     if(ieee80211_is_cts(frame->frame_control) == 1){
-        struct ieee80211_cts* CTSFrame = (struct ieee80211_cts*)(frame);
+        struct ieee80211_cts* CTSFrame = (struct ieee80211_cts*)(&(*frame));
         uint8_t ra[ETH_ALEN];
         memcpy(ra, CTSFrame->ra, ETH_ALEN);
         std::vector<std::vector<u_char>>  &ap = accessPoint::APmap;
