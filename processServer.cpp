@@ -79,19 +79,19 @@ void processServer::UDPUnpacking(int fd){
         exit(0);
     }
     int fLength = packetSize - rtLength;
+    frame_t* frameBody = (frame_t*)(recvBuff + rtLength);
+    if(ieee80211_is_cts(frameBody->frame_control) == 1){
+        recvPacket =  std::shared_ptr<_80211CTS>(new _80211CTS(rtLength, fLength));
+        printf("packet %d ", fLength);
+        recvPacket->setRadiotapHeader(rtHeader);
+        recvPacket->setFrameBody(recvBuff +rtLength);
+        recvPacket->parse();
+    }
 
-    _80211Packet capturedPacket(rtLength, fLength);
-    capturedPacket.setRadiotapHeader(rtHeader); //radiotap_header
-    capturedPacket.setFrame((frame_t*)(recvBuff + rtLength));//frame body
-
-    #ifdef __DEBUG__
+    #ifdef  __DEBUG__
     printf("执行时\n");
-    #endif // __DEBUG__
 
     //开始解析
-    capturedPacket.parse(0);
-
-    #ifdef __DEBUG__
     printf("解析成功\n");
     #endif // __DEBUG__
 }

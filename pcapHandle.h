@@ -6,7 +6,7 @@
 #include "80211Packet.h"
 
 
-using namespace hd80211;
+using namespace Ysing;
 
 ///改为单例模式会好一点
 class pcapHandle{

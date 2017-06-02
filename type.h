@@ -14,9 +14,12 @@
 
 #define le16_to_cpu __le16_to_cpu
 
-namespace hd80211{
+namespace Ysing{
     typedef struct ieee80211_radiotap_header rt_header_t;
     typedef struct ieee80211_hdr frame_t;
+    typedef struct ieee80211_cts cts_t;
+    typedef struct ieee80211_mgmt mgmt_t;
+    typedef struct ieee80211_ie ie_t;
 }
 
 #endif // CAPTURETYPE_H

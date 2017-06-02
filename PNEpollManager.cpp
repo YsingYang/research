@@ -40,13 +40,8 @@ bool PNEpollManager::addEvent(const int fd, int op){ ///单单先考虑读与ET 
 ///取消了if语句 ,但不是这里的问题
 **/
 bool PNEpollManager::delEvent(const int fd, int op){
-    /*struct epoll_event ev;
-    memset(&ev, 0, sizeof(ev));
-    ev.data.ptr = nullptr;*/
-    //不判断该错误了
     close(fd);
     epoll_ctl(epollFD, EPOLL_CTL_DEL, fd, nullptr);
-        //return false;
     return true;
 }
 

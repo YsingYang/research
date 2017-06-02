@@ -1,3 +1,5 @@
+//#define RERIDE
+
 #include "pcapHandle.h"
 
 void LoopFunc(u_char* handleFileDescription, const struct pcap_pkthdr* packetHeader, const u_char* packetData){
@@ -7,15 +9,17 @@ void LoopFunc(u_char* handleFileDescription, const struct pcap_pkthdr* packetHea
         printf("radiotap length exceeds package caplen");
         exit(0);
     }
+
+    #ifdef RERIDE  ///有空再重写
+
     uint32_t fLength = packetHeader->caplen - rtLength;
-
     _80211Packet capturedPacket(rtLength, fLength);
-
     capturedPacket.setRadiotapHeader(rtHeader); //radiotap_header
     capturedPacket.setFrame((frame_t*)(rtHeader + rtLength));//frame body
     //开始解析
-    capturedPacket.parse(0);
+    capturedPacket.parse();
     printf("执行测试");
+    #endif // RERIDE
 
     ///定义需要调用的函数
 }

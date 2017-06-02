@@ -34,7 +34,7 @@ private:
     uint16_t TCPPort;
     struct sockaddr_in TCPSocketAddr, UDPSocketAddr;
     PNEpollManager epollManager;
-    std::shared_ptr<_80211Packet> recvPacket;
+    std::shared_ptr<_80211Packet> recvPacket; ///这种方法只适用于单线程
 };
 
 
