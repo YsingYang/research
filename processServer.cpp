@@ -1,4 +1,4 @@
-//#define __DEBUG__
+#define __DEBUG__
 
 #include "processServer.h"
 
@@ -12,7 +12,7 @@ processServer* processServer::Singleton(){
     return singleServer;
 }
 
-processServer::processServer(){
+processServer::processServer() : recvPacket(nullptr){
     if( (TCPSocketFD = socket(AF_INET, SOCK_STREAM, 0))  < 0){
         perror("Get TCPFD error ");
         exit(1);
@@ -66,42 +66,53 @@ void processServer::UDPUnpacking(int fd){
     memset((void*)&routerAddr, 0, structLength);
 
     if((packetSize = recvfrom(fd, recvBuff, 4096, 0,(sockaddr*)&routerAddr, &structLength)) < 0){
+        printf("recv error \n");
+        return;
         //return;
     }
-    //printf("执行测试 包大小为 %d \n", packetSize);
 
     rt_header_t* rtHeader = (rt_header_t*)(recvBuff); ///会不会出bug?
     int rtLength = le16_to_cpu( rtHeader -> it_len); //这句需要?
-    //printf("rtLength %d, packetSize %d\n",rtLength, packetSize);
     if(rtLength > packetSize){
-        //printf("radiotap length exceeds package caplen");
         return;
         exit(0);
     }
     int fLength = packetSize - rtLength;
-    frame_t* frameBody = (frame_t*)(recvBuff + rtLength);
-    if(ieee80211_is_cts(frameBody->frame_control) == 1){
-        recvPacket =  std::shared_ptr<_80211CTS>(new _80211CTS(rtLength, fLength));
-        printf("packet %d ", fLength);
+
+    recvPacket = packetFactory(rtLength, fLength, recvBuff);
+
+     #ifdef  __DEBUG__
+    if(recvPacket != nullptr){
         recvPacket->setRadiotapHeader(rtHeader);
-        recvPacket->setFrameBody(recvBuff +rtLength);
+        recvPacket->setFrameBody(recvBuff + rtLength);
         recvPacket->parse();
     }
 
-    #ifdef  __DEBUG__
-    printf("执行时\n");
-
-    //开始解析
-    printf("解析成功\n");
     #endif // __DEBUG__
 }
 
+//Packet工厂
+std::shared_ptr<_80211Packet> processServer::packetFactory(const int &rtLength, const int &fLength, u_char* recvBuff){
+    frame_t* frameBody = (frame_t*)(recvBuff + rtLength);
+    std::shared_ptr<_80211Packet> product = nullptr;
+    if(ieee80211_is_cts(frameBody->frame_control) == 1){ ///这里放在用工厂模式会好点
+        product =  std::shared_ptr<_80211CTS>(new _80211CTS(rtLength, fLength));
+    }
+    else if(ieee80211_is_probe_req(frameBody->frame_control) == 1){
+        product = std::shared_ptr<_80211ProbeRequest>(new _80211ProbeRequest(rtLength, fLength));
+    }
+    else if(ieee80211_is_beacon(frameBody->frame_control) == 1){
+        product = std::shared_ptr<_80211Beacon>(new _80211Beacon(rtLength, fLength));
+    }
+    return product;
+}
+
+
+//服务器类的接受, 暂时只处理UDP包
 void processServer::serverProcess(){
     int recvReadyEvents;
-    //printf("%d , and %d , %d \n",TCPSocketFD, UDPSocketFD, epollManager.epollFD);
     while(1){
         recvReadyEvents = epollManager.eventPoller();
-        //printf("recvNum, %d\n", recvReadyEvents);
         for(int i = 0; i < recvReadyEvents; ++i){ ///暂时只写了UDP端口的监听
             if(epollManager.recvEvent[i].data.fd == UDPSocketFD)
                 UDPUnpacking(UDPSocketFD);

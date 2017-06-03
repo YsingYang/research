@@ -19,12 +19,13 @@ public:
     static processServer* Singleton();
     void serverProcess();
     void UDPUnpacking(int fd);
+
 private:
     processServer();
-
     processServer(processServer &) = delete;
     processServer& operator=(processServer &) = delete;
 
+    std::shared_ptr<_80211Packet> packetFactory(const int &, const int &, u_char*);
 
     static processServer* singleServer;
 
