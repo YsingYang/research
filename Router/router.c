@@ -39,30 +39,15 @@ int main(){
 }
 
 void loopFunction(u_char *user, const struct pcap_pkthdr *packetHeader,const u_char *packetData){
-
     uint32_t packetLength = packetHeader -> caplen;
     for(int i = 0; i < packetLength ;++i){
         printf("%02x  ", packetData[i]);
     }
 
-    printf("\n\n");
-    //struct ieee80211_radiotap_header *rt_header = (struct ieee80211_radiotap_header *) packetData;
-    /*int rt_len = le16_to_cpu(rt_header->it_len);
-    printf("%d \n", packetLength);
-    printf("%d\n",  rt_len);
-    //char packet[packetLength];
-    //memcpy(packet, packetData, packetLength);
-    //packet[packetLength] = '\0';
-
-    if(connect(sockFD, (sockaddr*)&clientAddr), sizeof(sockaddr) < 0){
-        perror("connect error ");
-        exit(1);
-    }*/
-
-
-
     if(sendto(sockFD,  packetData, packetLength, 0, (struct sockaddr*)(&clientAddr), sizeof(clientAddr)) < 0){
     	perror("send to error ");
     }
-
 }
+
+
+

@@ -1,13 +1,6 @@
 #include "80211Packet.h"
 
 
-/*std::function<void()> _80211Packet::parseProbeRequest = nullptr;
-std::function<void()> _80211Packet::parseBeacon = nullptr;
-std::function<void()> _80211Packet::parseRTS = nullptr;
-std::function<void()> _80211Packet::parseCTS = nullptr;
-std::function<void()> _80211Packet::parseQOSData = nullptr;
-std::function<void()> _80211Packet::parseData =nullptr ;
-*/
 
 //Packet构造函数
 _80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :
@@ -42,6 +35,44 @@ void _80211CTS::parse(){
     }
 }
 
+_80211ProbeRequest::_80211ProbeRequest(uint32_t rtLen, uint32_t fLen):_80211Packet(rtLen, fLen), frameBody(nullptr){
+
+}
+
+//Probe Request解析函数
+void _80211ProbeRequest::parse(){
+    if(parseFunc != nullptr){
+        parseFunc(this);
+    }
+
+    else{
+        uint8_t sa[ETH_ALEN];
+        memcpy(sa, frameBody->mgmt->sa, ETH_ALEN); //解析源地址
+        std::vector<std::vector<u_char>> &ap = accessPoint::APmap;
+        printf("I'm probe Request frame size %d , ra addr : %02x %02x %02x %02x %02x %02x \n",this->getFrameLength(), sa[0], sa[1], sa[2], sa[3], sa[4], sa[5]);
+        for(uint32_t i = 0 ;i < ap.size(); ++i){
+            if(memcmp(&ap[i][0], sa, ETH_ALEN) == 0){
+                printf("cmp successfully \n");
+            }
+        }
+    }
+}
+
+_80211Beacon::_80211Beacon(uint32_t rtLen, uint32_t fLen): _80211Packet(rtLen, fLen), frameBody(nullptr){
+
+}
+
+void _80211Beacon::parse(){
+    if(parseFunc != nullptr){
+        parseFunc(this);
+    }
+    else{
+        uint8_t sa[ETH_ALEN];
+        memcpy(sa, frameBody->mgmt->sa, ETH_ALEN); //解析源地址
+        //std::vector<std::vector<u_char>> &ap = accessPoint::APmap;
+        printf("I'm Beacon frame size %d , ra addr : %02x %02x %02x %02x %02x %02x \n",this->getFrameLength(), sa[0], sa[1], sa[2], sa[3], sa[4], sa[5]);
+    }
+}
 
 
 

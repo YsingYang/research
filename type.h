@@ -20,6 +20,23 @@ namespace Ysing{
     typedef struct ieee80211_cts cts_t;
     typedef struct ieee80211_mgmt mgmt_t;
     typedef struct ieee80211_ie ie_t;
+
+
+    class mgmtBody{
+    public:
+        mgmtBody(u_char* data) : mgmt(nullptr), ie(nullptr){
+            mgmt = new mgmt_t();
+            memcpy((void*)mgmt, data, sizeof(mgmt_t));
+            ie = (ie_t*)mgmt->u.probe_req.variable;
+        }
+
+        ~mgmtBody(){
+            delete mgmt;
+        }
+
+        mgmt_t* mgmt;
+        ie_t* ie;
+    };
 }
 
 #endif // CAPTURETYPE_H

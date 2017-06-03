@@ -12,27 +12,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
-//#include "ieee80211.h"
-//#include "ieee80211_radiotap.h"
 
-/*void loopFunction(u_char *user, const struct pcap_pkthdr *packetHeader,const u_char *packetData){
-    uint32_t packetLength = packetHeader -> caplen;
-    printf("%d \n", packetLength);
-    //char packet[packetLength];
-    //memcpy(packet, packetData, packetLength);
-    //packet[packetLength] = '\0';
-
-    if(connect(sockFD, (sockaddr*)&clientAddr), sizeof(sockaddr) < 0){
-        perror("connect error ");
-        exit(1);
-    }
-
-
-
-    sendto(sockFD,  packetData, packetLength, 0, (struct sockaddr*)(&clientAddr), sizeof(clientAddr));
-
-}*/
-
+void RTSSend
 
 
 #endif
