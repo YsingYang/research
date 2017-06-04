@@ -45,9 +45,6 @@
 		<Unit filename="PNEpollManager.h" />
 		<Unit filename="Router/ieee80211.h" />
 		<Unit filename="Router/ieee80211_radiotap.h" />
-		<Unit filename="Router/router.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="Router/routerForwardPacket.h" />
 		<Unit filename="ieee80211.h" />
 		<Unit filename="ieee80211_radiotap.h" />
