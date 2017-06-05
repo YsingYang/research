@@ -11,7 +11,6 @@
 #include <functional>
 #include <string.h>
 #include <vector>
-
 #define le16_to_cpu __le16_to_cpu
 
 namespace Ysing{
@@ -20,6 +19,7 @@ namespace Ysing{
     typedef struct ieee80211_cts cts_t;
     typedef struct ieee80211_mgmt mgmt_t;
     typedef struct ieee80211_ie ie_t;
+    typedef struct ieee80211_qos_hdr qos_t;
 
 
     class mgmtBody{

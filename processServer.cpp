@@ -104,6 +104,9 @@ std::shared_ptr<_80211Packet> processServer::packetFactory(const int &rtLength, 
     else if(ieee80211_is_beacon(frameBody->frame_control) == 1){
         product = std::shared_ptr<_80211Beacon>(new _80211Beacon(rtLength, fLength));
     }
+    else if(ieee80211_is_data_qos(frameBody->frame_control) == 1){
+        product  = std::shared_ptr<_80211QOSData>(new _80211QOSData(rtLength, fLength));
+    }
     return product;
 }
 

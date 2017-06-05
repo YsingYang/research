@@ -1,14 +1,41 @@
+#define __DEBUG__
+
 #include "80211Packet.h"
 
 
 
+
+
+std::function<void(void* args)> _80211Beacon::parseFunc = nullptr;
+
+void _80211Beacon::resetParseFunc(std::function<void(void* args)> func){
+    parseFunc = func;
+}
+
+std::function<void(void* args)> _80211CTS::parseFunc = nullptr;
+
+void _80211CTS::resetParseFunc(std::function<void(void* args)>func){
+    parseFunc = func;
+}
+
+std::function<void(void* args)> _80211ProbeRequest::parseFunc = nullptr;
+
+void _80211ProbeRequest::resetParseFunc(std::function<void(void* args)> func){
+    parseFunc = func;
+}
+
+std::function<void(void* args)> _80211QOSData::parseFunc = nullptr;
+
+void _80211QOSData::resetParseFunc(std::function<void(void* args)> func){
+    parseFunc = func;
+}
+
 //Packet构造函数
 _80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :
-    radiotapHeaderLength(rtLen), frameLength(fLen), radiotapHeader(new ieee80211_radiotap_header), parseFunc(nullptr){
+    radiotapHeaderLength(rtLen), frameLength(fLen), radiotapHeader(new ieee80211_radiotap_header){
 }
 
  _80211Packet::~_80211Packet(){}
-
 
 
 
@@ -17,9 +44,16 @@ _80211CTS::_80211CTS(uint32_t rtLen, uint32_t fLen):_80211Packet(rtLen, fLen), f
 
 }
 
+void _80211CTS::setFrameBody(u_char* data){
+    memcpy((void*)(frameBody.get()), (void*)(data), sizeof(cts_t));
+}
+
 //CTS解析函数
 void _80211CTS::parse(){
     if(parseFunc != nullptr){ //修改了解析函数
+        #ifdef __DEBUG__
+        printf("Doing callback in CTS\n");
+        #endif // __DEBUG__
         parseFunc(this);
     }
     else{
@@ -39,9 +73,17 @@ _80211ProbeRequest::_80211ProbeRequest(uint32_t rtLen, uint32_t fLen):_80211Pack
 
 }
 
+void _80211ProbeRequest::setFrameBody(u_char* data){
+    frameBody = std::shared_ptr<mgmtBody>(new mgmtBody(data));
+}
+
+
 //Probe Request解析函数
 void _80211ProbeRequest::parse(){
     if(parseFunc != nullptr){
+        #ifdef __DEBUG__
+        printf("Doing callback in Probe\n");
+        #endif // __DEBUG__
         parseFunc(this);
     }
 
@@ -62,8 +104,15 @@ _80211Beacon::_80211Beacon(uint32_t rtLen, uint32_t fLen): _80211Packet(rtLen, f
 
 }
 
+void _80211Beacon::setFrameBody(u_char* data){
+    frameBody = std::shared_ptr<mgmtBody>(new mgmtBody(data));
+}
+
 void _80211Beacon::parse(){
     if(parseFunc != nullptr){
+        #ifdef __DEBUG__
+        printf("Doing callback in Beacon\n");
+        #endif
         parseFunc(this);
     }
     else{
@@ -74,6 +123,33 @@ void _80211Beacon::parse(){
     }
 }
 
+
+_80211QOSData::_80211QOSData(uint32_t rtLen, uint32_t fLen):_80211Packet(rtLen, fLen), frameBody(nullptr){
+
+}
+
+void _80211QOSData::setFrameBody(u_char* data){
+    frameBody = std::shared_ptr<qos_t>(new qos_t);
+    memcpy((void*)(frameBody.get()), data, sizeof(qos_t));
+}
+
+void _80211QOSData::parse(){
+    if(parseFunc != nullptr){
+        #ifdef __DEBUG__
+        printf("Doing callback in QoS\n");
+        #endif // __DEBUG__
+        parseFunc(this);
+    }
+    else{
+            uint8_t BSS[ETH_ALEN];
+            uint8_t Source[ETH_ALEN];
+            uint8_t Destination[ETH_ALEN];
+            memcpy(BSS, frameBody->addr1, ETH_ALEN);
+            memcpy(Source, frameBody->addr2, ETH_ALEN);
+            memcpy(Destination, frameBody->addr3, ETH_ALEN);
+            printf("I'm QoS Data, BSS Addr : %02x %02x %02x %02x %02x %02x \n ", BSS[0], BSS[1], Source[0], Source[1], Destination[0], Destination[1]);
+    }
+}
 
 
 
