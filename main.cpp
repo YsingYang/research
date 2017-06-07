@@ -21,6 +21,10 @@ int main(){
     #endif // __CALLBACK__
     accessPoint::addAccessPoint();
     processServer *server = processServer::Singleton();
+    std::vector<std::vector<char>> targetList;
+    targetList.emplace_back(std::vector<char>({'\xEC', '\x17', '\x2F', '\x2D', '\xB6', '\xB8'}));
+    targetList.emplace_back(std::vector<char>({'\xd0', '\xa6', '\x37', '\x0e', '\x12', '\x75'}));
+    server->addTarget(targetList);
     server->serverProcess();
 
 }

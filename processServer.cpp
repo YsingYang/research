@@ -1,7 +1,7 @@
 #define __DEBUG__
 
 #include "processServer.h"
-
+#include "target.h"
 
 processServer* processServer::singleServer = nullptr;
 
@@ -12,7 +12,7 @@ processServer* processServer::Singleton(){
     return singleServer;
 }
 
-processServer::processServer() : recvPacket(nullptr){
+processServer::processServer() : recvPacket(nullptr), controler(nullptr){
     if( (TCPSocketFD = socket(AF_INET, SOCK_STREAM, 0))  < 0){
         perror("Get TCPFD error ");
         exit(1);
@@ -53,6 +53,8 @@ processServer::processServer() : recvPacket(nullptr){
     epollManager.addEvent(TCPSocketFD, 0);
     epollManager.addEvent(UDPSocketFD, 0);
     listen(TCPSocketFD, 100);///tcp监听
+    controler = std::unique_ptr<targetControler> (targetControler::Singleton());
+    //这里写暂时写丑一点, 主要是用于初始化target列表, 不过没想到有什么好方法, 或者在哪里有list列
 }
 
 void processServer::UDPUnpacking(int fd){
@@ -96,16 +98,16 @@ std::shared_ptr<_80211Packet> processServer::packetFactory(const int &rtLength, 
     frame_t* frameBody = (frame_t*)(recvBuff + rtLength);
     std::shared_ptr<_80211Packet> product = nullptr;
     if(ieee80211_is_cts(frameBody->frame_control) == 1){ ///这里放在用工厂模式会好点
-        product =  std::shared_ptr<_80211CTS>(new _80211CTS(rtLength, fLength));
+        //product =  std::shared_ptr<_80211CTS>(new _80211CTS(rtLength, fLength, this));
     }
     else if(ieee80211_is_probe_req(frameBody->frame_control) == 1){
-        product = std::shared_ptr<_80211ProbeRequest>(new _80211ProbeRequest(rtLength, fLength));
+        product = std::shared_ptr<_80211ProbeRequest>(new _80211ProbeRequest(rtLength, fLength, this));
     }
     else if(ieee80211_is_beacon(frameBody->frame_control) == 1){
-        product = std::shared_ptr<_80211Beacon>(new _80211Beacon(rtLength, fLength));
+        //product = std::shared_ptr<_80211Beacon>(new _80211Beacon(rtLength, fLength, this));
     }
     else if(ieee80211_is_data_qos(frameBody->frame_control) == 1){
-        product  = std::shared_ptr<_80211QOSData>(new _80211QOSData(rtLength, fLength));
+        //product  = std::shared_ptr<_80211QOSData>(new _80211QOSData(rtLength, fLength, this));
     }
     return product;
 }
@@ -120,5 +122,11 @@ void processServer::serverProcess(){
             if(epollManager.recvEvent[i].data.fd == UDPSocketFD)
                 UDPUnpacking(UDPSocketFD);
         }
+    }
+}
+
+void processServer::addTarget(std::vector<std::vector<char>>& targetList){
+    for(uint32_t i = 0; i < targetList.size(); ++i){
+        controler->addTarget(targetList[i]);
     }
 }

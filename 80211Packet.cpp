@@ -1,7 +1,7 @@
-#define __DEBUG__
+//#define __DEBUG__
 
 #include "80211Packet.h"
-
+#include "processServer.h"
 
 
 
@@ -31,8 +31,8 @@ void _80211QOSData::resetParseFunc(std::function<void(void* args)> func){
 }
 
 //Packet构造函数
-_80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :
-    radiotapHeaderLength(rtLen), frameLength(fLen), radiotapHeader(new ieee80211_radiotap_header){
+_80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen, processServer* server_) :
+    radiotapHeaderLength(rtLen), frameLength(fLen), radiotapHeader(new ieee80211_radiotap_header), server(server_){
 }
 
  _80211Packet::~_80211Packet(){}
@@ -40,7 +40,7 @@ _80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen) :
 
 
 //CTS帧构造函数
-_80211CTS::_80211CTS(uint32_t rtLen, uint32_t fLen):_80211Packet(rtLen, fLen), frameBody(new cts_t){
+_80211CTS::_80211CTS(uint32_t rtLen, uint32_t fLen, processServer* server_):_80211Packet(rtLen, fLen, server_), frameBody(new cts_t){
 
 }
 
@@ -69,7 +69,7 @@ void _80211CTS::parse(){
     }
 }
 
-_80211ProbeRequest::_80211ProbeRequest(uint32_t rtLen, uint32_t fLen):_80211Packet(rtLen, fLen), frameBody(nullptr){
+_80211ProbeRequest::_80211ProbeRequest(uint32_t rtLen, uint32_t fLen, processServer* server_):_80211Packet(rtLen, fLen, server_), frameBody(nullptr){
 
 }
 
@@ -90,17 +90,20 @@ void _80211ProbeRequest::parse(){
     else{
         uint8_t sa[ETH_ALEN];
         memcpy(sa, frameBody->mgmt->sa, ETH_ALEN); //解析源地址
-        std::vector<std::vector<u_char>> &ap = accessPoint::APmap;
+        processServer* ownerServer = getPacketServer();
+
+        std::vector<std::vector<char>> &targetList = ownerServer->getTargetList();
         printf("I'm probe Request frame size %d , ra addr : %02x %02x %02x %02x %02x %02x \n",this->getFrameLength(), sa[0], sa[1], sa[2], sa[3], sa[4], sa[5]);
-        for(uint32_t i = 0 ;i < ap.size(); ++i){
-            if(memcmp(&ap[i][0], sa, ETH_ALEN) == 0){
-                printf("cmp successfully \n");
+        for(uint32_t i = 0; i < targetList.size(); ++i){
+            printf("compare probe request %02x %02x %02x %02x %02x %02x \n ", targetList[i][0], targetList[i][1], targetList[i][2], targetList[i][3], targetList[i][4], targetList[i][5]);
+            if(memcmp(sa, &targetList[i][0], ETH_ALEN) == 0){
+                printf("compare successfully\n");
             }
         }
     }
 }
 
-_80211Beacon::_80211Beacon(uint32_t rtLen, uint32_t fLen): _80211Packet(rtLen, fLen), frameBody(nullptr){
+_80211Beacon::_80211Beacon(uint32_t rtLen, uint32_t fLen, processServer* server_): _80211Packet(rtLen, fLen, server_), frameBody(nullptr){
 
 }
 
@@ -124,7 +127,7 @@ void _80211Beacon::parse(){
 }
 
 
-_80211QOSData::_80211QOSData(uint32_t rtLen, uint32_t fLen):_80211Packet(rtLen, fLen), frameBody(nullptr){
+_80211QOSData::_80211QOSData(uint32_t rtLen, uint32_t fLen, processServer* server_):_80211Packet(rtLen, fLen, server_), frameBody(nullptr){
 
 }
 

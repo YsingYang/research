@@ -18,6 +18,7 @@
 				</Compiler>
 				<Linker>
 					<Add library="/usr/lib/x86_64-linux-gnu/libpcap.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libpthread.so" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -53,6 +54,8 @@
 		<Unit filename="pcapHandle.h" />
 		<Unit filename="processServer.cpp" />
 		<Unit filename="processServer.h" />
+		<Unit filename="target.cpp" />
+		<Unit filename="target.h" />
 		<Unit filename="type.h" />
 		<Extensions>
 			<code_completion />
