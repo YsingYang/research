@@ -6,7 +6,7 @@
 	"type.h"
 	"80211Packet.h"
 
-1496845898 source:/home/ysing/codeblock Projects/80211Capture/main.cpp
+1496932833 source:/home/ysing/codeblock Projects/80211Capture/main.cpp
 	"pcapHandle.h"
 	"processServer.h"
 	"AccessPoint.h"
@@ -74,15 +74,16 @@
 1496062880 source:/home/ycyber/Cprogram/80211Capture/80211Packet.cpp
 	"80211Packet.h"
 
-1496847929 source:/home/ysing/codeblock Projects/80211Capture/80211Packet.cpp
+1496929216 source:/home/ysing/codeblock Projects/80211Capture/80211Packet.cpp
 	"80211Packet.h"
 	"processServer.h"
 
-1496847684 source:/home/ysing/codeblock Projects/80211Capture/processServer.cpp
+1496931140 source:/home/ysing/codeblock Projects/80211Capture/processServer.cpp
 	"processServer.h"
 	"target.h"
+	"DeviceSet.h"
 
-1496847450 /home/ysing/codeblock Projects/80211Capture/processServer.h
+1496931097 /home/ysing/codeblock Projects/80211Capture/processServer.h
 	<sys/socket.h>
 	<arpa/inet.h>
 	<stdlib.h>
@@ -149,4 +150,14 @@
 1496845301 /home/ysing/codeblock Projects/80211Capture/target.h
 	<pthread.h>
 	<vector>
+
+1496933052 source:/home/ysing/codeblock Projects/80211Capture/Device.cpp
+	"Device.h"
+
+1496933069 /home/ysing/codeblock Projects/80211Capture/Device.h
+	<string>
+
+1496933089 /home/ysing/codeblock Projects/80211Capture/DeviceSet.h
+	<map>
+	<memory>
 

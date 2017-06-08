@@ -92,7 +92,7 @@ void _80211ProbeRequest::parse(){
         memcpy(sa, frameBody->mgmt->sa, ETH_ALEN); //解析源地址
         processServer* ownerServer = getPacketServer();
 
-        std::vector<std::vector<char>> &targetList = ownerServer->getTargetList();
+        std::vector<std::vector<u_char>> &targetList = ownerServer->getTargetList();
         printf("I'm probe Request frame size %d , ra addr : %02x %02x %02x %02x %02x %02x \n",this->getFrameLength(), sa[0], sa[1], sa[2], sa[3], sa[4], sa[5]);
         for(uint32_t i = 0; i < targetList.size(); ++i){
             printf("compare probe request %02x %02x %02x %02x %02x %02x \n ", targetList[i][0], targetList[i][1], targetList[i][2], targetList[i][3], targetList[i][4], targetList[i][5]);

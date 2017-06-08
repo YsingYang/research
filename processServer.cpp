@@ -2,6 +2,7 @@
 
 #include "processServer.h"
 #include "target.h"
+#include "DeviceSet.h"
 
 processServer* processServer::singleServer = nullptr;
 
@@ -12,7 +13,7 @@ processServer* processServer::Singleton(){
     return singleServer;
 }
 
-processServer::processServer() : recvPacket(nullptr), controler(nullptr){
+processServer::processServer() : recvPacket(nullptr), controler(nullptr), ownerDeviceSet(new deviceSet()){
     if( (TCPSocketFD = socket(AF_INET, SOCK_STREAM, 0))  < 0){
         perror("Get TCPFD error ");
         exit(1);
@@ -125,8 +126,8 @@ void processServer::serverProcess(){
     }
 }
 
-void processServer::addTarget(std::vector<std::vector<char>>& targetList){
-    for(uint32_t i = 0; i < targetList.size(); ++i){
-        controler->addTarget(targetList[i]);
+void processServer::addTarget(std::vector<std::vector<u_char>>& target){
+    for(uint32_t i = 0; i < target.size(); ++i){
+        targetList.emplace_back(target[i]);
     }
 }
