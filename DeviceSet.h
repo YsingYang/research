@@ -20,6 +20,7 @@ private:
     deviceSet& operator=(deviceSet &) = delete;
 
     std::map<std::string, std::shared_ptr<device>> capturedDeviceSet;
+    std::map<std::pair<int, int>, std::set<std::shared_ptr<device>>> DeviceMapping;
 };
 
 

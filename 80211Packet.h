@@ -17,7 +17,7 @@
 using namespace Ysing;
 
 
-
+class device;
 class processServer;
 //所有802.11包的基类
 class _80211Packet{
@@ -33,6 +33,7 @@ public:
     //需要重写的函数
     virtual void setFrameBody(u_char *) = 0;
     virtual void parse() = 0 ;
+    virtual std::shared_ptr<device> sptrParse() = 0;//用于需要作为返回device的解析函数
     virtual ~_80211Packet() = 0;
 
 private:
@@ -100,6 +101,7 @@ public:
 
     void setFrameBody(u_char* data) override;
     void parse() override;
+    std::shared_ptr<device> sptrParse() override;
 private:
     std::shared_ptr<mgmtBody> frameBody;
     static std::function<void(void* args)> parseFunc;

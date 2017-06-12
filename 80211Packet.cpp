@@ -2,7 +2,7 @@
 
 #include "80211Packet.h"
 #include "processServer.h"
-
+#include "Device.h"
 
 
 
@@ -37,7 +37,9 @@ _80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen, processServer* server_
 
  _80211Packet::~_80211Packet(){}
 
-
+std::shared_ptr<device> _80211Packet::sptrParse(){
+    printf("Base sptrParse , Do nothing \n");
+}
 
 //CTS帧构造函数
 _80211CTS::_80211CTS(uint32_t rtLen, uint32_t fLen, processServer* server_):_80211Packet(rtLen, fLen, server_), frameBody(new cts_t){
@@ -101,6 +103,25 @@ void _80211ProbeRequest::parse(){
             }
         }
     }
+}
+
+
+std::shared_ptr<device> _80211ProbeRequest::sptrParse(){
+    shared_ptr<device> capturedDevice(new device(string(), -1, 0, 0));//capinfi 初始化为-1 , 表示该设备没有capinfo信息
+    struct ieee80211_ie = static_cast<struct ieee80211_ie>frameBody->u.probe.req.variable;
+    uint32_t ssidLength;
+    int remain = frameLength;
+    string SSID;
+    short capInfo = 0;
+    uint16_t seq = 0;
+    while(remain > FCS_LEN){
+        switch(ie->id){
+            case WLAN_EID_SSID:
+                ssidLength = static_cast<int>(ie->len);
+
+        }
+    }
+
 }
 
 _80211Beacon::_80211Beacon(uint32_t rtLen, uint32_t fLen, processServer* server_): _80211Packet(rtLen, fLen, server_), frameBody(nullptr){
