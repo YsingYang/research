@@ -22,18 +22,19 @@ class processServer;
 //所有802.11包的基类
 class _80211Packet{
 public:
-    _80211Packet(uint32_t rtLen, uint32_t fLen, processServer* );
+    _80211Packet(uint32_t rtLen, uint32_t fLen, uint16_t , processServer* );
     //deep copy!!
     inline processServer* getPacketServer() const;
     inline void setRadiotapHeader(rt_header_t* data);
     inline uint32_t getFrameLength () const;
     inline uint32_t getRadiotapHeaderLength () const;
+    inline uint16_t getType() const;
     inline std::weak_ptr<rt_header_t> getRadiotapBody() const;
 
     //需要重写的函数
-    virtual void setFrameBody(u_char *) = 0;
+    virtual void setFrameBody(u_char *, uint32_t) = 0;
     virtual void parse() = 0 ;
-    virtual std::shared_ptr<device> sptrParse() = 0;//用于需要作为返回device的解析函数
+    virtual std::shared_ptr<device> sptrParse();//用于需要作为返回device的解析函数
     virtual ~_80211Packet() = 0;
 
 private:
@@ -42,6 +43,7 @@ private:
 
     uint32_t radiotapHeaderLength;
     uint32_t frameLength;
+    uint16_t type;
     std::shared_ptr<ieee80211_radiotap_header> radiotapHeader;
     processServer* server;//指向所属的服务器, 不用管理析构
 protected:
@@ -65,6 +67,10 @@ inline uint32_t _80211Packet::getRadiotapHeaderLength () const{
     return radiotapHeaderLength;
 }
 
+inline uint16_t _80211Packet::getType() const{
+    return type;
+}
+
 inline void _80211Packet::setRadiotapHeader(rt_header_t* data){
     memcpy((void*)(radiotapHeader.get()),  (void*)data, sizeof(rt_header_t));
 }
@@ -72,13 +78,13 @@ inline void _80211Packet::setRadiotapHeader(rt_header_t* data){
 //CTS类
 class _80211CTS : public _80211Packet{
 public:
-    _80211CTS(uint32_t rtLen, uint32_t fLen, processServer* );
+    _80211CTS(uint32_t rtLen, uint32_t fLen, uint16_t t, processServer* );
     ~_80211CTS() = default;
 
     inline std::weak_ptr<cts_t> getFrameBody() const;
     // set radiotap函数不变
     static void resetParseFunc(std::function<void(void* args)>);
-    void setFrameBody(u_char *data) override;
+    void setFrameBody(u_char *data, uint32_t dataLength) override;
     void parse() override;
 
 private:
@@ -94,12 +100,12 @@ std::weak_ptr<cts_t> _80211CTS::getFrameBody() const{
 //ProbeRequest类
 class _80211ProbeRequest : public _80211Packet{
 public:
-    _80211ProbeRequest(uint32_t rtLen, uint32_t fLen, processServer* );
+    _80211ProbeRequest(uint32_t rtLen, uint32_t fLen, uint16_t , processServer* );
     ~_80211ProbeRequest() = default;
 
     static void resetParseFunc(std::function<void(void* args)>);
 
-    void setFrameBody(u_char* data) override;
+    void setFrameBody(u_char* data, uint32_t dataLength) override;
     void parse() override;
     std::shared_ptr<device> sptrParse() override;
 private:
@@ -109,14 +115,14 @@ private:
 
 class _80211Beacon : public _80211Packet{
 public:
-    _80211Beacon(uint32_t rtLen, uint32_t fLen, processServer* );
+    _80211Beacon(uint32_t rtLen, uint32_t fLen, uint16_t, processServer* );
     ~_80211Beacon() = default;
 
     inline std::weak_ptr<mgmtBody> getFrameBody() const;
 
     static void resetParseFunc(std::function<void(void* args)>);
 
-    void setFrameBody(u_char* data) override;
+    void setFrameBody(u_char* data, uint32_t ) override;
     void parse() override;
 
 
@@ -133,14 +139,14 @@ std::weak_ptr<mgmtBody> _80211Beacon::getFrameBody() const{
 //就能得到连接的设备地址了
 class _80211QOSData : public _80211Packet{
 public:
-    _80211QOSData(uint32_t rtLen, uint32_t fLen, processServer* );
+    _80211QOSData(uint32_t rtLen, uint32_t fLen, uint16_t, processServer* );
     ~_80211QOSData() = default;
 
     inline std::weak_ptr<qos_t> getFrameBody() const;
 
     static void resetParseFunc(std::function<void(void* args)>);
 
-    void setFrameBody(u_char* data) override;
+    void setFrameBody(u_char* data, uint32_t) override;
     void parse() override;
 
 private:

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <memory>
+#include <set>
 class device;
 
 class deviceSet{

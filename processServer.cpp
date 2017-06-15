@@ -3,6 +3,8 @@
 #include "processServer.h"
 #include "target.h"
 #include "DeviceSet.h"
+#include "Device.h"
+#include <iostream>
 
 processServer* processServer::singleServer = nullptr;
 
@@ -87,11 +89,19 @@ void processServer::UDPUnpacking(int fd){
      #ifdef  __DEBUG__
     if(recvPacket != nullptr){
         recvPacket->setRadiotapHeader(rtHeader);
-        recvPacket->setFrameBody(recvBuff + rtLength);
-        recvPacket->parse();
+        recvPacket->setFrameBody(recvBuff + rtLength, fLength);
+        //recvPacket->parse();
 
         //假设是probe Request, 收集数据集
-        std::shared
+        if(ieee80211_is_probe_req(recvPacket->getType())){
+            std::shared_ptr<device> newDevice = recvPacket->sptrParse();
+            std::cout<<"Create a new Device, MACAddress : " << std::hex<<newDevice->getCurrentMAC()<<" htinfo :" << newDevice->getCapInfo()<<"SSID :";
+            std::set<std::string> slist = newDevice->getSSIDList();
+            for(auto&i : slist){
+                std::cout<<i<<"  ";
+            }
+            std::cout<<std::endl;
+        }
     }
 
     #endif // __DEBUG__
@@ -102,16 +112,16 @@ std::shared_ptr<_80211Packet> processServer::packetFactory(const int &rtLength, 
     frame_t* frameBody = (frame_t*)(recvBuff + rtLength);
     std::shared_ptr<_80211Packet> product = nullptr;
     if(ieee80211_is_cts(frameBody->frame_control) == 1){ ///这里放在用工厂模式会好点
-        //product =  std::shared_ptr<_80211CTS>(new _80211CTS(rtLength, fLength, this));
+        product =  std::shared_ptr<_80211CTS>(new _80211CTS(rtLength, fLength, frameBody->frame_control, this));
     }
     else if(ieee80211_is_probe_req(frameBody->frame_control) == 1){
-        product = std::shared_ptr<_80211ProbeRequest>(new _80211ProbeRequest(rtLength, fLength, this));
+        product = std::shared_ptr<_80211ProbeRequest>(new _80211ProbeRequest(rtLength, fLength, frameBody->frame_control, this));
     }
     else if(ieee80211_is_beacon(frameBody->frame_control) == 1){
-        //product = std::shared_ptr<_80211Beacon>(new _80211Beacon(rtLength, fLength, this));
+        product = std::shared_ptr<_80211Beacon>(new _80211Beacon(rtLength, fLength, frameBody->frame_control, this));
     }
     else if(ieee80211_is_data_qos(frameBody->frame_control) == 1){
-        //product  = std::shared_ptr<_80211QOSData>(new _80211QOSData(rtLength, fLength, this));
+        product  = std::shared_ptr<_80211QOSData>(new _80211QOSData(rtLength, fLength, frameBody->frame_control, this));
     }
     return product;
 }

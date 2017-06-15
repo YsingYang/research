@@ -3,6 +3,8 @@
 #include "80211Packet.h"
 #include "processServer.h"
 #include "Device.h"
+#include <assert.h>
+#include <iostream>
 
 
 
@@ -31,22 +33,25 @@ void _80211QOSData::resetParseFunc(std::function<void(void* args)> func){
 }
 
 //Packet构造函数
-_80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen, processServer* server_) :
-    radiotapHeaderLength(rtLen), frameLength(fLen), radiotapHeader(new ieee80211_radiotap_header), server(server_){
+_80211Packet::_80211Packet(uint32_t rtLen, uint32_t fLen,uint16_t t, processServer* server_) :
+    radiotapHeaderLength(rtLen), frameLength(fLen), type(t), radiotapHeader(new ieee80211_radiotap_header), server(server_){
 }
 
  _80211Packet::~_80211Packet(){}
 
+
 std::shared_ptr<device> _80211Packet::sptrParse(){
-    printf("Base sptrParse , Do nothing \n");
+    printf("Do nothing \n");
+    return std::shared_ptr<device>();
 }
+
 
 //CTS帧构造函数
-_80211CTS::_80211CTS(uint32_t rtLen, uint32_t fLen, processServer* server_):_80211Packet(rtLen, fLen, server_), frameBody(new cts_t){
+_80211CTS::_80211CTS(uint32_t rtLen, uint32_t fLen, uint16_t t, processServer* server_):_80211Packet(rtLen, fLen, t, server_), frameBody(new cts_t){
 
 }
 
-void _80211CTS::setFrameBody(u_char* data){
+void _80211CTS::setFrameBody(u_char* data, uint32_t dataLength){
     memcpy((void*)(frameBody.get()), (void*)(data), sizeof(cts_t));
 }
 
@@ -71,12 +76,12 @@ void _80211CTS::parse(){
     }
 }
 
-_80211ProbeRequest::_80211ProbeRequest(uint32_t rtLen, uint32_t fLen, processServer* server_):_80211Packet(rtLen, fLen, server_), frameBody(nullptr){
+_80211ProbeRequest::_80211ProbeRequest(uint32_t rtLen, uint32_t fLen, uint16_t t, processServer* server_):_80211Packet(rtLen, fLen, t, server_), frameBody(nullptr){
 
 }
 
-void _80211ProbeRequest::setFrameBody(u_char* data){
-    frameBody = std::shared_ptr<mgmtBody>(new mgmtBody(data));
+void _80211ProbeRequest::setFrameBody(u_char* data, uint32_t dataLength){
+    frameBody = std::shared_ptr<mgmtBody>(new mgmtBody(data, dataLength));
 }
 
 
@@ -107,29 +112,41 @@ void _80211ProbeRequest::parse(){
 
 
 std::shared_ptr<device> _80211ProbeRequest::sptrParse(){
-    shared_ptr<device> capturedDevice(new device(string(), -1, 0, 0));//capinfi 初始化为-1 , 表示该设备没有capinfo信息
-    struct ieee80211_ie = static_cast<struct ieee80211_ie>frameBody->u.probe.req.variable;
-    uint32_t ssidLength;
-    int remain = frameLength;
-    string SSID;
-    short capInfo = 0;
-    uint16_t seq = 0;
+    struct ieee80211_ie* ie = static_cast<struct ieee80211_ie*> (frameBody->ie);
+    uint32_t ssidLength = 0;
+    int remain = getFrameLength();
+    std::string MACAddress(6, ' ');
+    std::set<std::string> ssidList;
+    memcpy((void*)(&MACAddress[0]), (void*)(&(frameBody->mgmt->sa[0])), 6);
+    short capInfo = -1;
+    uint16_t seq = le16_to_cpu(frameBody->mgmt->seq_ctrl); //获取seq;
+
     while(remain > FCS_LEN){
         switch(ie->id){
             case WLAN_EID_SSID:
                 ssidLength = static_cast<int>(ie->len);
-
+                if(ssidLength != 0){
+                    ssidList.insert(std::string((char*)(ie->data), ssidLength));
+                    std::cout<<"ssid : " << std::string(std::string((char*)(ie->data), ssidLength))<<std::endl;
+                }
+            case WLAN_EID_HT_CAPABILITY :
+                struct ieee80211_ht_cap* cap = (struct ieee80211_ht_cap*)(ie->data);
+                capInfo = le16_to_cpu(cap->cap_info);//获取cap信息
         }
+        remain -= ie->len + 2;
+        ie = (struct ieee80211_ie*)((u_char*)ie + ie->len + 2);//下一个循环
     }
+    uint32_t pkSize = getFrameLength() - ssidLength;
+    assert(pkSize > 0);
+    return std::shared_ptr<device>(new device(MACAddress, capInfo, pkSize, seq, ssidList));
+}
+
+_80211Beacon::_80211Beacon(uint32_t rtLen, uint32_t fLen, uint16_t t, processServer* server_): _80211Packet(rtLen, fLen, t, server_), frameBody(nullptr){
 
 }
 
-_80211Beacon::_80211Beacon(uint32_t rtLen, uint32_t fLen, processServer* server_): _80211Packet(rtLen, fLen, server_), frameBody(nullptr){
-
-}
-
-void _80211Beacon::setFrameBody(u_char* data){
-    frameBody = std::shared_ptr<mgmtBody>(new mgmtBody(data));
+void _80211Beacon::setFrameBody(u_char* data, uint32_t dataLength){
+    frameBody = std::shared_ptr<mgmtBody>(new mgmtBody(data, dataLength));
 }
 
 void _80211Beacon::parse(){
@@ -148,11 +165,11 @@ void _80211Beacon::parse(){
 }
 
 
-_80211QOSData::_80211QOSData(uint32_t rtLen, uint32_t fLen, processServer* server_):_80211Packet(rtLen, fLen, server_), frameBody(nullptr){
+_80211QOSData::_80211QOSData(uint32_t rtLen, uint32_t fLen, uint16_t t, processServer* server_):_80211Packet(rtLen, fLen, t, server_), frameBody(nullptr){
 
 }
 
-void _80211QOSData::setFrameBody(u_char* data){
+void _80211QOSData::setFrameBody(u_char* data, uint32_t dataLength){
     frameBody = std::shared_ptr<qos_t>(new qos_t);
     memcpy((void*)(frameBody.get()), data, sizeof(qos_t));
 }

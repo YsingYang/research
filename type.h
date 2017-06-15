@@ -24,9 +24,9 @@ namespace Ysing{
 
     class mgmtBody{
     public:
-        mgmtBody(u_char* data) : mgmt(nullptr), ie(nullptr){
+        mgmtBody(u_char* data, uint32_t dataLength) : mgmt(nullptr), ie(nullptr){
             mgmt = new mgmt_t();
-            memcpy((void*)mgmt, data, sizeof(mgmt_t));
+            memcpy((void*)mgmt, data, dataLength);
             ie = (ie_t*)mgmt->u.probe_req.variable;
         }
 

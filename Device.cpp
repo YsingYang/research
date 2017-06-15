@@ -22,6 +22,7 @@ std::string device::DecToHexStr(const std::string &addr){
     return HexStr;
 }
 
-device::device(std::string MAC , short cap, uint32_t pkSize, uint16_t seq) : capInfo(cap), MACKey(MAC), currentMAC(MAC), packetSize(pkSize), sequence(seq){
+device::device(std::string MAC , short cap, uint32_t pkSize, uint16_t seq, std::set<std::string> ssid) :
+        capInfo(cap), MACKey(MAC), currentMAC(MAC), packetSize(pkSize), sequence(seq), SSIDList(ssid){
 
 }
