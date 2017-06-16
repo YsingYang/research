@@ -90,7 +90,8 @@ void processServer::UDPUnpacking(int fd){
     if(recvPacket != nullptr){
         recvPacket->setRadiotapHeader(rtHeader);
         recvPacket->setFrameBody(recvBuff + rtLength, fLength);
-        //recvPacket->parse();
+        if(ieee80211_is_cts(recvPacket->getType())) //解析CTS
+            recvPacket->parse();
 
         //假设是probe Request, 收集数据集
         if(ieee80211_is_probe_req(recvPacket->getType())){

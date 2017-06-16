@@ -67,10 +67,12 @@ void _80211CTS::parse(){
         uint8_t ra[ETH_ALEN];
         memcpy(ra, frameBody->ra, ETH_ALEN);
         std::vector<std::vector<u_char>>  &ap = accessPoint::APmap;
-        printf("frame size , ra addr : %02x %02x %02x %02x %02x %02x \n", ra[0], ra[1], ra[2], ra[3], ra[4], ra[5]);
+        printf("CTS frame size , ra addr : %02x %02x %02x %02x %02x %02x \n", ra[0], ra[1], ra[2], ra[3], ra[4], ra[5]);
+
         for(uint32_t i = 0; i < ap.size(); ++i){
             if(memcmp(&ap[i][0], ra, ETH_ALEN) == 0){
-                printf("cmp successfully \n");
+                printf("%ld, %ld \n", timeStart, clock());
+                printf("cmp successfully  %f\n", (clock() - timeStart) / CLOCKS_PER_SEC * 1.0);
             }
         }
     }
@@ -115,9 +117,9 @@ std::shared_ptr<device> _80211ProbeRequest::sptrParse(){
     struct ieee80211_ie* ie = static_cast<struct ieee80211_ie*> (frameBody->ie);
     uint32_t ssidLength = 0;
     int remain = getFrameLength();
-    std::string MACAddress(6, ' ');
+    std::string MACAddress = device::DecToHexStr(std::string((char*)(&(frameBody->mgmt->sa[0])), 6));
     std::set<std::string> ssidList;
-    memcpy((void*)(&MACAddress[0]), (void*)(&(frameBody->mgmt->sa[0])), 6);
+    //memcpy((void*)(&MACAddress[0]), (void*)(&(frameBody->mgmt->sa[0])), 6);
     short capInfo = -1;
     uint16_t seq = le16_to_cpu(frameBody->mgmt->seq_ctrl); //获取seq;
 

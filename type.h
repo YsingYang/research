@@ -25,13 +25,13 @@ namespace Ysing{
     class mgmtBody{
     public:
         mgmtBody(u_char* data, uint32_t dataLength) : mgmt(nullptr), ie(nullptr){
-            mgmt = new mgmt_t();
+            mgmt = (mgmt_t*)malloc(dataLength);
             memcpy((void*)mgmt, data, dataLength);
             ie = (ie_t*)mgmt->u.probe_req.variable;
         }
 
         ~mgmtBody(){
-            delete mgmt;
+            free(mgmt);
         }
 
         mgmt_t* mgmt;

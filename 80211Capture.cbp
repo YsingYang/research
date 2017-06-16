@@ -50,7 +50,7 @@
 		<Unit filename="Router/ieee80211.h" />
 		<Unit filename="Router/ieee80211_radiotap.h" />
 		<Unit filename="Router/routerForwardPacket.h" />
-		<Unit filename="Test/DeviceCreateTester.cpp" />
+		<Unit filename="Test/RTSTesterReceTime.cpp" />
 		<Unit filename="ieee80211.h" />
 		<Unit filename="ieee80211_radiotap.h" />
 		<Unit filename="pcapHandle.cpp" />

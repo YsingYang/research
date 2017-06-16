@@ -12,11 +12,13 @@
 #include "PNEpollManager.h"
 #include "80211Packet.h"
 #include "target.h"
-
+#include <time.h>
 //单例, 暂时没考虑线程安全
 
 class targetControler;
 class deviceSet;
+
+extern long  timeStart ;
 
 class processServer{
 
