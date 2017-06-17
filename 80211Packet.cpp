@@ -116,27 +116,26 @@ void _80211ProbeRequest::parse(){
 std::shared_ptr<device> _80211ProbeRequest::sptrParse(){
     struct ieee80211_ie* ie = static_cast<struct ieee80211_ie*> (frameBody->ie);
     uint32_t ssidLength = 0;
-    int remain = getFrameLength();
+    int remain = getFrameLength() - 24;
     std::string MACAddress = device::DecToHexStr(std::string((char*)(&(frameBody->mgmt->sa[0])), 6));
     std::set<std::string> ssidList;
-    //memcpy((void*)(&MACAddress[0]), (void*)(&(frameBody->mgmt->sa[0])), 6);
     short capInfo = -1;
     uint16_t seq = le16_to_cpu(frameBody->mgmt->seq_ctrl); //获取seq;
-
     while(remain > FCS_LEN){
         switch(ie->id){
             case WLAN_EID_SSID:
                 ssidLength = static_cast<int>(ie->len);
                 if(ssidLength != 0){
                     ssidList.insert(std::string((char*)(ie->data), ssidLength));
-                    std::cout<<"ssid : " << std::string(std::string((char*)(ie->data), ssidLength))<<std::endl;
                 }
+                break;
             case WLAN_EID_HT_CAPABILITY :
                 struct ieee80211_ht_cap* cap = (struct ieee80211_ht_cap*)(ie->data);
                 capInfo = le16_to_cpu(cap->cap_info);//获取cap信息
+                break;
         }
         remain -= ie->len + 2;
-        ie = (struct ieee80211_ie*)((u_char*)ie + ie->len + 2);//下一个循环
+        ie = (struct ieee80211_ie*)((u_char*)(ie) + ie->len + 2);//下一个循环
     }
     uint32_t pkSize = getFrameLength() - ssidLength;
     assert(pkSize > 0);
