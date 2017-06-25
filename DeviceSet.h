@@ -15,6 +15,7 @@ public:
     void addDevice(std::shared_ptr<device> );
     void updateDevice(std::shared_ptr<device>);
     void removeDevice(std::string );
+    bool deviceInSet(std::shared_ptr<device>&);
 
 private:
     deviceSet(deviceSet &) = delete;

@@ -2,6 +2,7 @@
 
 #include "80211Packet.h"
 #include "processServer.h"
+#include "PNTimeStamp.h"
 #include "Device.h"
 #include <assert.h>
 #include <iostream>
@@ -67,12 +68,11 @@ void _80211CTS::parse(){
         uint8_t ra[ETH_ALEN];
         memcpy(ra, frameBody->ra, ETH_ALEN);
         std::vector<std::vector<u_char>>  &ap = accessPoint::APmap;
-        printf("CTS frame size , ra addr : %02x %02x %02x %02x %02x %02x \n", ra[0], ra[1], ra[2], ra[3], ra[4], ra[5]);
+       // printf("CTS frame size , ra addr : %02x %02x %02x %02x %02x %02x \n", ra[0], ra[1], ra[2], ra[3], ra[4], ra[5]);
 
         for(uint32_t i = 0; i < ap.size(); ++i){
             if(memcmp(&ap[i][0], ra, ETH_ALEN) == 0){
-                printf("%ld, %ld \n", timeStart, clock());
-                printf("cmp successfully  %f\n", (clock() - timeStart) / CLOCKS_PER_SEC * 1.0);
+                printf("cmp successfully  and time %s \n", PNTimestamp(PNTimestamp::now()).toFormattedString().c_str());
             }
         }
     }

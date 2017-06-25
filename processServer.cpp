@@ -1,4 +1,5 @@
 #define __DEBUG__
+//#define __SPTR_FUNCTOR__
 
 #include "processServer.h"
 #include "target.h"
@@ -75,7 +76,6 @@ void processServer::UDPUnpacking(int fd){
         return;
         //return;
     }
-
     rt_header_t* rtHeader = (rt_header_t*)(recvBuff); ///会不会出bug?
     int rtLength = le16_to_cpu( rtHeader -> it_len); //这句需要?
     if(rtLength > packetSize){
@@ -91,12 +91,13 @@ void processServer::UDPUnpacking(int fd){
         recvPacket->setRadiotapHeader(rtHeader);
         recvPacket->setFrameBody(recvBuff + rtLength, fLength);
         if(ieee80211_is_cts(recvPacket->getType())){ //解析CTS
-           // recvPacket->parse();
+            recvPacket->parse();
         }
 
         //假设是probe Request, 收集数据集
+        #ifdef  __SPTR_FUNCTOR__
         if(ieee80211_is_probe_req(recvPacket->getType())){
-            std::shared_ptr<device> newDevice = recvPacket->sptrParse();
+            std::shared_ptr<device> newDevice = recvPacket->sptrParse(); //获取到该设备的信息, 添加到
             std::cout<<"Create a new Device, MACAddress : " << std::hex<<newDevice->getCurrentMAC()<<" htinfo :" << newDevice->getCapInfo()<<"SSID :";
             std::set<std::string> slist = newDevice->getSSIDList();
             for(auto&i : slist){
@@ -104,6 +105,7 @@ void processServer::UDPUnpacking(int fd){
             }
             std::cout<<std::endl;
         }
+        #endif // __SPTR_FUNCTOR__
     }
 
     #endif // __DEBUG__

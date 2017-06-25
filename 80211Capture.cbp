@@ -47,6 +47,8 @@
 		<Unit filename="DeviceSet.h" />
 		<Unit filename="PNEpollManager.cpp" />
 		<Unit filename="PNEpollManager.h" />
+		<Unit filename="PNTimeStamp.cpp" />
+		<Unit filename="PNTimeStamp.h" />
 		<Unit filename="Router/ieee80211.h" />
 		<Unit filename="Router/ieee80211_radiotap.h" />
 		<Unit filename="Router/routerForwardPacket.h" />
