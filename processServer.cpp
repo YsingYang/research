@@ -1,5 +1,5 @@
 #define __DEBUG__
-//#define __SPTR_FUNCTOR__
+#define __SPTR_FUNCTOR__
 
 #include "processServer.h"
 #include "target.h"
@@ -98,12 +98,8 @@ void processServer::UDPUnpacking(int fd){
         #ifdef  __SPTR_FUNCTOR__
         if(ieee80211_is_probe_req(recvPacket->getType())){
             std::shared_ptr<device> newDevice = recvPacket->sptrParse(); //获取到该设备的信息, 添加到
-            std::cout<<"Create a new Device, MACAddress : " << std::hex<<newDevice->getCurrentMAC()<<" htinfo :" << newDevice->getCapInfo()<<"SSID :";
-            std::set<std::string> slist = newDevice->getSSIDList();
-            for(auto&i : slist){
-                std::cout<<i<<"  ";
-            }
-            std::cout<<std::endl;
+            ///1. 找deviceSet中是否有相应的key
+
         }
         #endif // __SPTR_FUNCTOR__
     }
