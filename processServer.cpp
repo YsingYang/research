@@ -99,12 +99,24 @@ void processServer::UDPUnpacking(int fd){
         if(ieee80211_is_probe_req(recvPacket->getType())){
             std::shared_ptr<device> newDevice = recvPacket->sptrParse(); //获取到该设备的信息, 添加到
             ///1. 找deviceSet中是否有相应的key
+            auto it = ownerDeviceSet->findDeviceInSet(newDevice); //set<shared_ptr<device>> ::iterator
+            if(ownerDeviceSet->isNulliterator(it)){ //如果设备在集合中, 找到是否是随机化设备(包括找 randomMapping)
+                deviceSet::deviceKey key = std::make_pair(*it->getCapInfo(), *it->getPacketSize());
+                ownerDeviceSet[key]
+            }
+            else{
+                updateDeviceSet(newDevice, it);
+            }
 
         }
         #endif // __SPTR_FUNCTOR__
     }
 
     #endif // __DEBUG__
+}
+
+void processServer::updateDeviceSet(const std::shared_ptr<device>& dv, deviceSet::deviceIterator it){
+    *it->update(dv);
 }
 
 //Packet工厂

@@ -28,10 +28,13 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-std=c++11" />
 					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libpthread.so" />
+					<Add library="/usr/lib/x86_64-linux-gnu/libpcap.so" />
 				</Linker>
 			</Target>
 		</Build>
@@ -44,11 +47,13 @@
 		<Unit filename="AccessPoint.h" />
 		<Unit filename="Device.cpp" />
 		<Unit filename="Device.h" />
+		<Unit filename="DeviceSet.cpp" />
 		<Unit filename="DeviceSet.h" />
 		<Unit filename="PNEpollManager.cpp" />
 		<Unit filename="PNEpollManager.h" />
 		<Unit filename="PNTimeStamp.cpp" />
 		<Unit filename="PNTimeStamp.h" />
+		<Unit filename="Redundant.h" />
 		<Unit filename="Router/ieee80211.h" />
 		<Unit filename="Router/ieee80211_radiotap.h" />
 		<Unit filename="Router/routerForwardPacket.h" />

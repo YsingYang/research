@@ -35,6 +35,7 @@ private:
     processServer(processServer &) = delete;
     processServer& operator=(processServer &) = delete;
 
+    void updateDeviceSet(const std::shared_ptr<device>&);
     std::shared_ptr<_80211Packet> packetFactory(const int &, const int &, u_char*);
 
     static processServer* singleServer;

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <memory>
 
 class deviceSet;
 class device{
@@ -20,6 +21,12 @@ public:
     inline uint32_t getPacketSize() const;
     inline uint16_t getSeq() const;
     inline std::set<std::string> getSSIDList() const;
+
+    inline void setCurrentMAC(std::string&);
+    inline void setSeq(uint16_t );
+    inline void addSSIDList(std::set<std::string>& );
+
+    void update(std::shared_ptr<device>&);
 
 private:
     short capInfo;
@@ -53,6 +60,22 @@ uint16_t device::getSeq() const{
 
 std::set<std::string> device::getSSIDList() const{
     return SSIDList;
+} //有没有什么办法返回set或map的引用
+
+void device::setCurrentMAC(std::string &MAC){
+    currentMAC = MAC;
+}
+
+void device::setSeq(uint16_t seq){
+    sequence = seq;
+}
+
+void device::addSSIDList(std::set<std::string>& s_list){
+    if(s_list.empty())
+        return;
+    for(auto &it : s_list){
+            SSIDList.insert(it);
+    }
 }
 
 #endif // DEVICE_H
