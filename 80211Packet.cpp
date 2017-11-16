@@ -8,7 +8,8 @@
 #include <iostream>
 
 
-
+long long lastTime = -1;
+int lastSeq = -1;
 std::function<void(void* args)> _80211Beacon::parseFunc = nullptr;
 
 void _80211Beacon::resetParseFunc(std::function<void(void* args)> func){
@@ -68,7 +69,7 @@ void _80211CTS::parse(){
         uint8_t ra[ETH_ALEN];
         memcpy(ra, frameBody->ra, ETH_ALEN);
         std::vector<std::vector<u_char>>  &ap = accessPoint::APmap;
-       // printf("CTS frame size , ra addr : %02x %02x %02x %02x %02x %02x \n", ra[0], ra[1], ra[2], ra[3], ra[4], ra[5]);
+        //printf("CTS frame size , ra addr : %02x %02x %02x %02x %02x %02x \n", ra[0], ra[1], ra[2], ra[3], ra[4], ra[5]);
 
         for(uint32_t i = 0; i < ap.size(); ++i){
             if(memcmp(&ap[i][0], ra, ETH_ALEN) == 0){
@@ -159,9 +160,31 @@ void _80211Beacon::parse(){
     }
     else{
         uint8_t sa[ETH_ALEN];
+        uint8_t target[ETH_ALEN];
         memcpy(sa, frameBody->mgmt->sa, ETH_ALEN); //解析源地址
         //std::vector<std::vector<u_char>> &ap = accessPoint::APmap;
-        printf("I'm Beacon frame size %d , ra addr : %02x %02x %02x %02x %02x %02x \n",this->getFrameLength(), sa[0], sa[1], sa[2], sa[3], sa[4], sa[5]);
+        memcpy(&target, "\xdc\xef\x09\xd0\x42\x2e", ETH_ALEN);
+        if(memcmp(&sa, &target, 6) == 0) { //提取相应的timestamp 与 beacon interval
+            Ysing::mgmt_t* frame = frameBody->mgmt;
+            int seq = le16_to_cpu(frame->seq_ctrl>>4);
+            long long time = le64toh(frame->u.beacon.timestamp);
+            if(lastSeq != -1){
+                //std::cout<<seq<<"  "<<time<<std::endl;
+                long long result  =  ((time - lastTime) * 1.0);
+                if(abs(102400 -result) > 20000){
+                    std::cout<<seq << "   "<< lastSeq << "  " << time << "   "<<lastTime<<std::endl;
+                }
+                std::cout<<result<<std::endl;
+            }
+            lastSeq = seq;
+            lastTime = time;
+            //printf("%ld\n", le64toh(frame->u.beacon.timestamp));
+            //printf("%d\n", le16_to_cpu(frame->u.beacon.beacon_int));
+            //printf("%d, %x\n", le16_to_cpu(frame->seq_ctrl>>4), le16toh(frame->seq_ctrl>>4));
+
+
+            //printf("I'm Beacon frame size %d , ra addr : %02x %02x %02x %02x %02x %02x \n",this->getFrameLength(), sa[0], sa[1], sa[2], sa[3], sa[4], sa[5]);
+        }
     }
 }
 

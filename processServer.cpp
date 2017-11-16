@@ -1,5 +1,5 @@
 #define __DEBUG__
-#define __SPTR_FUNCTOR__
+//#define __SPTR_FUNCTOR__
 
 #include "processServer.h"
 #include "target.h"
@@ -91,6 +91,10 @@ void processServer::UDPUnpacking(int fd){
         recvPacket->setRadiotapHeader(rtHeader);
         recvPacket->setFrameBody(recvBuff + rtLength, fLength);
         if(ieee80211_is_cts(recvPacket->getType())){ //解析CTS
+            //recvPacket->parse();
+        }
+
+        if(ieee80211_is_beacon(recvPacket->getType())) {
             recvPacket->parse();
         }
 
@@ -101,11 +105,12 @@ void processServer::UDPUnpacking(int fd){
             ///1. 找deviceSet中是否有相应的key
             auto it = ownerDeviceSet->findDeviceInSet(newDevice); //set<shared_ptr<device>> ::iterator
             if(ownerDeviceSet->isNulliterator(it)){ //如果设备在集合中, 找到是否是随机化设备(包括找 randomMapping)
-                deviceSet::deviceKey key = std::make_pair(*it->getCapInfo(), *it->getPacketSize());
-                ownerDeviceSet[key]
+                    //如果没有
+                deviceSet::deviceKey key = std::make_pair((*it)->getCapInfo(), (*it)->getPacketSize()); //找到相应的set
+                //deviceSet::SetType retriveSet = (*ownerDeviceSet)->getMA[key]; ///提取相应的set ,  deviceSet要给一个接口返回相应的set
             }
             else{
-                updateDeviceSet(newDevice, it);
+               // updateDeviceSet(newDevice, it);
             }
 
         }
@@ -115,9 +120,9 @@ void processServer::UDPUnpacking(int fd){
     #endif // __DEBUG__
 }
 
-void processServer::updateDeviceSet(const std::shared_ptr<device>& dv, deviceSet::deviceIterator it){
+/*void processServer::updateDeviceSet(const std::shared_ptr<device>& dv, deviceSet::deviceIterator it){
     *it->update(dv);
-}
+}*/
 
 //Packet工厂
 std::shared_ptr<_80211Packet> processServer::packetFactory(const int &rtLength, const int &fLength, u_char* recvBuff){
